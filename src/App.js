@@ -1,4 +1,3 @@
-
 import React, {useState, useEffect} from 'react';
 import './App.css';
 import axios from 'axios';
@@ -11,6 +10,7 @@ import {
   Link
 } from "react-router-dom";
 import Pokemon from './components/Pokemon'
+import PokemonInfo from './components/PokemonInfo'
 
 
 
@@ -18,16 +18,17 @@ import Pokemon from './components/Pokemon'
 const App = () => {
 
   const [data, setData] = useState([]);
-  const [parameter, setParameter] = useState('')
+  const [search, setSearch] = useState('')
   
   const fetchData = async () => {
-    await axios.get(`https://quiet-falls-70006.herokuapp.com/pokemon/${parameter}`)
+    await axios.get(`https://quiet-falls-70006.herokuapp.com/pokemon/`)
     .then((res) => setData(res.data))
     .catch((err) => console.log(err))
   }
 
   useEffect(() => {
     fetchData()
+    setSearch('')
   }, [])
 
 
@@ -36,24 +37,40 @@ const App = () => {
     <div className="App">
       <Router>
       <NavigationBar />
-
-      <Link to='/'>Home</Link>
-      <Route path="/:id?">
-        <Pokemon data={data}/>
+      <Switch>
+      <Route exact path="/pokemon/:id">
+        <Pokemon />
       </Route>
+      <Route exact path="/pokemon/:id/:info">
+        <PokemonInfo />
+      </Route>
+    
+      <Route exact path='/'>
       <div>
-      <p> Poki Fight Project is working ...</p>
-      <Route path='/'>
-      <ul>
-        {data && data.map(e => {
+      <div><h3>List of pokemon</h3></div>
+        <input
+        type="text"
+        placeholder="Search.."
+        onChange = {(event) => setSearch(event.target.value)}
+          />
+        {data && data.filter((e) => {
+          if(search === "") {
+            return e;
+          }
+          else if(e.name.english.toLowerCase().includes(search.toLowerCase())) {
+            return search; 
+          }
+        })
+        .map((e, index) => {
           return(
-            <li><Link exact to={`${e.id}`}>{e.name.english}</Link></li>
+            <p key={index}><Link exact to={`/pokemon/${e.id}`} >    {e.name.english}   </Link></p>
           )
         })}
-      </ul>
-      </Route>
-
       </div>
+      </Route>
+      </Switch>
+
+      
       </Router>
     </div>
 
