@@ -34,7 +34,9 @@ const PokemonInfo = () => {
         <h1>Loading...</h1>
       ) : (
         <div>
+          <div>
           <img alt='image' src={getImageURL(id)} width="150" />
+          </div>
 
           <div>
             {info === "name" ? (
